@@ -1,15 +1,18 @@
 import { VercelRequest, VercelResponse } from "@vercel/node"
 import { Telegraf } from "telegraf"
-import { TelegrafContext } from "telegraf/typings/context"
+import TelegrafContext  from "telegraf/typings/context"
 
-export const BOT_TOKEN = process.env.BOT_TOKEN
+const BOT_TOKEN = process.env.BOT_TOKEN
+const bot = new Telegraf(BOT_TOKEN)
+
 const SECRET_HASH = "32e58fbahey833349df3383dc910e180"
 // Note: change to false when running locally
 const BASE_PATH =
   process.env.VERCEL_ENV === "production"
-    ? "<https://yourdomain.com>"
-    : "https://telegram-bot-jsjoeio.jsjoeio.coder.app"
-const bot = new Telegraf(BOT_TOKEN)
+    ? "https://tg-message-bot.vercel.app"
+    : "http://localhost:3000"
+
+
 
 export async function handleTestCommand(ctx: TelegrafContext) {
   const COMMAND = "/test"
@@ -29,6 +32,7 @@ export async function handleTestCommand(ctx: TelegrafContext) {
     )
   }
 }
+
 export async function handleOnMessage(ctx: TelegrafContext) {
   const { message } = ctx
 
@@ -55,6 +59,12 @@ bot.command("test", async (ctx) => {
 bot.on("message", async (ctx) => {
   await handleOnMessage(ctx)
 })
+
+bot.start((ctx) => ctx.reply('Welcome'))
+bot.command('oldschool', (ctx) => ctx.reply('Hello'))
+bot.command('modern', ({ reply }) => reply('Yo'))
+bot.command('hipster', Telegraf.reply('λ'))
+bot.launch()
 
 export default async (req: VercelRequest, res: VercelResponse) => {
   try {
